@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1 Supprimer la tâche ##{task.id}
+
+  .card
+    h3 #{task.titre}
+    p Description: #{task.description || '—'}
+    p Deadline: #{task.datetime ? new Date(task.datetime).toLocaleString() : '—'}
+    p Label: #{task.Label ? `${task.Label.name} (${task.Label.color})` : '—'}
+
+  form(method="POST" action=`/delete/${task.id}`)
+    button(type="submit" style="background:#e53935;color:#fff;border:none;padding:8px 12px;border-radius:6px") Delete
+    |  
+    a(href="/") Annuler
+
+  style.
+    .card { border:1px solid #ddd; padding:10px; margin:8px 0; border-radius:8px; }

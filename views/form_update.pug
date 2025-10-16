@@ -1,0 +1,54 @@
+extends layout
+
+block content
+  h1 Modifier la tâche ##{values && values.id}
+
+  if errors && errors.length
+    ul(style="color:#b00")
+      each err in errors
+        li= err
+
+  form(method="POST" action=`/update/${values && values.id}`)
+    .field
+      label(for="titre") Titre *
+      input#titre(
+        type="text"
+        name="titre"
+        required
+        value=((values && values.titre) || '')
+      )
+
+    .field
+      label(for="description") Description
+      textarea#description(name="description") #{(values && values.description) || ''}
+
+    .field
+      label(for="datetime") Deadline *
+      // on suppose que values.datetime est déjà "YYYY-MM-DDTHH:mm"
+      input#datetime(
+        type="datetime-local"
+        name="datetime"
+        required
+        value=((values && values.datetime) || '')
+      )
+
+    .field
+      label(for="labelId") Label
+      select#labelId(name="labelId")
+        option(value="") — Aucun —
+        each l in labels
+          - const sel = (String((values && values.labelId) || '') === String(l.id))
+          option(value=l.id selected=sel) #{`${l.name} (${l.color})`}
+
+    .field
+      label
+        input(
+          type="checkbox"
+          name="done"
+          checked=((values && values.done) ? true : false)
+        )
+        |  Marquer comme fait
+
+    button(type="submit") Send
+    |  
+    a(href="/") Retour

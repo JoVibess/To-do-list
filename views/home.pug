@@ -1,0 +1,83 @@
+extends layout
+
+block content
+  h1 to-do-list
+
+  //- Barre d’actions
+  form(method="GET" action="/")
+    .field
+      label(for="q") Recherche (id, titre, description, date)
+      input#q(type="text" name="q" placeholder="ex: 12 ou courses ou 2025-10-01" value=q)
+
+    .row
+      //- Filtre état
+      label(for="done") État
+      select#done(name="done")
+        option(value="") Tous
+        option(value="0" selected=(done===''?false:done==='0')) À faire
+        option(value="1" selected=(done===''?false:done==='1')) Fait
+
+      //- Filtre label
+      label(for="labelId") Label
+      select#labelId(name="labelId")
+        option(value="") Tous
+        each l in labels
+          option(value=l.id selected=(String(labelId||'')===String(l.id)))= l.name
+
+      //- Tri
+      label(for="orderBy") Trier par
+      select#orderBy(name="orderBy")
+        option(value="id" selected=(orderBy==='id')) id
+        option(value="datetime" selected=(orderBy==='datetime')) date/heure
+        option(value="titre" selected=(orderBy==='titre')) titre
+        option(value="done" selected=(orderBy==='done')) état
+        option(value="label" selected=(orderBy==='label')) label
+
+      select(name="order")
+        option(value="asc" selected=(order==='asc')) asc
+        option(value="desc" selected=(order==='desc')) desc
+
+      button(type="submit") Appliquer
+
+    p
+      a(href="/new") + Ajouter une task
+
+  hr
+
+  h2 À faire
+  if !tasksTodo.length
+    p (aucune tâche)
+  else
+    each t in tasksTodo
+      .card
+        h3 #{t.titre}
+        p Description: #{t.description || '—'}
+        p Deadline: #{t.datetime ? new Date(t.datetime).toLocaleString() : '—'}
+        p Label: #{t.Label ? `${t.Label.name} (${t.Label.color})` : '—'}
+        .actions
+          a(href=`/update/${t.id}`) Update
+          |  
+          a(href=`/delete/${t.id}`) Delete
+
+  hr
+
+  h2 Fait
+  if !tasksDone.length
+    p (rien de terminé)
+  else
+    each t in tasksDone
+      .card
+        h3 #{t.titre}
+        p Description: #{t.description || '—'}
+        p Deadline: #{t.datetime ? new Date(t.datetime).toLocaleString() : '—'}
+        p Label: #{t.Label ? `${t.Label.name} (${t.Label.color})` : '—'}
+        .actions
+          a(href=`/update/${t.id}`) Update
+          |  
+          a(href=`/delete/${t.id}`) Delete
+
+  style.
+    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; }
+    .card { border:1px solid #ddd; padding:10px; margin:8px 0; border-radius:8px; }
+    .actions a { text-decoration:none; padding:6px 10px; border:1px solid #aaa; border-radius:6px; }
+    .actions a:hover { background:#f5f5f5; }
