@@ -1,0 +1,33 @@
+extends layout
+
+block content
+  h1 Nouvelle tâche
+
+  if errors && errors.length
+    ul(style="color:#b00")
+      each err in errors
+        li= err
+
+  form(method="POST" action="/new")
+    .field
+      label(for="titre") Titre *
+      input#titre(type="text" name="titre" required value=(values?.titre || ''))
+
+    .field
+      label(for="description") Description
+      textarea#description(name="description")= values?.description || ''
+
+    .field
+      label(for="datetime") Deadline *
+      input#datetime(type="datetime-local" name="datetime" required value=(values?.datetime || ''))
+
+    .field
+      label(for="labelId") Label
+      select#labelId(name="labelId")
+        option(value="") — Aucun —
+        each l in labels
+          option(value=l.id selected=(String(values?.labelId||'')===String(l.id)))= `${l.name} (${l.color})`
+
+    button(type="submit") Créer
+    |  
+    a(href="/") Retour
