@@ -2,16 +2,16 @@
 const express = require("express");
 const router = express.Router();
 const { Op } = require("sequelize");
-const { Task, Label } = require("../models/Index");
+const { Task, Label } = require("../models/Index.js ");
 const { toSqlDatetime } = require("../utils/utils");
 const {
   buildWhereFromQuery,
   buildOrderFromQuery,
 } = require("../utils/helpers");
 
-/**
- * Page d’accueil /
- */
+//---------------------------------------------------
+// Page d’accueil /
+//---------------------------------------------------
 
 router.get("/", async (req, res) => {
   const {
@@ -46,9 +46,10 @@ router.get("/", async (req, res) => {
   });
 });
 
-/**
- * /new (formulaire d’ajout)
- */
+//---------------------------------------------------
+// /new (formulaire d’ajout)
+//---------------------------------------------------
+
 router.get("/new", async (_req, res) => {
   const labels = await Label.findAll({ order: [["name", "ASC"]] });
   res.render("form_new", { errors: null, values: {}, labels });
@@ -88,19 +89,18 @@ router.post("/new", async (req, res) => {
   } catch (e) {
     console.error(e);
     const labels = await Label.findAll({ order: [["name", "ASC"]] });
-    res
-      .status(500)
-      .render("form_new", {
-        errors: ["Erreur serveur"],
-        values: req.body,
-        labels,
-      });
+    res.status(500).render("form_new", {
+      errors: ["Erreur serveur"],
+      values: req.body,
+      labels,
+    });
   }
 });
 
-/**
- * /delete/:id
- */
+//---------------------------------------------------
+// /delete/:id
+//---------------------------------------------------
+
 router.get("/delete/:id", async (req, res) => {
   const id = Number.parseInt(req.params.id, 10);
   const task = await Task.findByPk(id, {
@@ -116,9 +116,10 @@ router.post("/delete/:id", async (req, res) => {
   res.redirect("/");
 });
 
-/**
- * /update/:id
- */
+//---------------------------------------------------
+// /update/:id
+//---------------------------------------------------
+
 router.get("/update/:id", async (req, res) => {
   const id = Number.parseInt(req.params.id, 10);
   const task = await Task.findByPk(id);
