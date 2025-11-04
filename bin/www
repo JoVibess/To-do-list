@@ -1,3 +1,8 @@
+
+/**
+ * Boot Express + Sequelize (avec migrations)
+ */
+
 const path = require("path");
 const dotenv = require("dotenv");
 
@@ -11,43 +16,60 @@ const http = require("http");
 
 const { sequelize, Label } = require("../models"); 
 
+const sequelize = require("../core/sequelize");
+const { Label } = require("../models/Index"); // adapte la casse selon ton fichier
+
 const port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 
 const server = http.createServer(app);
 
+
+/**
+ * Démarrage asynchrone : connexion DB → puis écoute HTTP
+ */
+
 (async () => {
   try {
     console.log("Connexion DB…");
     await sequelize.authenticate();
-    console.log("DB connectée");
+    console.log("Base de données connectée");
+
 
     console.log("Sync modèles…");
     await sequelize.sync({ alter: true }); // en prod: préférer les migrations
     console.log("Sync OK");
 
-    // Seed Labels si vide
+    // ⚠️ NE PAS UTILISER sync() si tu travailles avec les migrations Sequelize CLI
+    // Les tables doivent déjà être créées via : npx sequelize-cli db:migrate
+
+
+    // Seed Label si vide
     if ((await Label.count()) === 0) {
       await Label.bulkCreate([
         { name: "Perso",   color: "#4CAF50" },
         { name: "Travail", color: "#2196F3" },
         { name: "Urgent",  color: "#F44336" },
       ]);
-      console.log("Seed labels OK");
+      console.log("Labels par défaut insérés");
     }
 
     server.listen(port);
     server.on("error", onError);
     server.on("listening", onListening);
   } catch (err) {
-    console.error("Échec init serveur:", err);
+    console.error("Échec au démarrage du serveur :", err.message);
     process.exit(1);
   }
 })();
 
 function normalizePort(val) {
   const n = parseInt(val, 10);
+
   if (Number.isNaN(n)) return val; // named pipe
+
+  if (Number.isNaN(n)) return val;
+
   if (n >= 0) return n;
   return false;
 }
@@ -66,13 +88,23 @@ function onListening() {
   const addr = server.address();
   const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   debug("Listening on " + bind);
-  console.log(`🚀 http://127.0.0.1:${bind.replace("port ", "")}`);
+  console.log(`🚀 Serveur en écoute sur http://127.0.0.1:${bind.replace("port ", "")}`);
 }
 
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
 async function shutdown() {
+
   console.log("\nArrêt…");
   try { await sequelize.close(); console.log("DB fermée"); } catch (e) { console.error("Erreur fermeture DB:", e); }
+
+  console.log("\nArrêt du serveur…");
+  try {
+    await sequelize.close();
+    console.log("Connexion DB fermée");
+  } catch (e) {
+    console.error("Erreur fermeture DB:", e);
+  }
+
   server.close(() => process.exit(0));
 }

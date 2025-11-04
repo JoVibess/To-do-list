@@ -1,3 +1,4 @@
+
 'use strict';
 
 const fs = require('fs');
@@ -41,3 +42,31 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 module.exports = db;
+
+const Task = require("./Task");
+const Label = require("./Label");
+const User = require("./User");
+
+// Label 1–N Task
+Label.hasMany(Task, {
+  foreignKey: { name: "labelId", field: "label_id" },
+  onDelete: "SET NULL",
+  onUpdate: "CASCADE",
+});
+Task.belongsTo(Label, {
+  foreignKey: { name: "labelId", field: "label_id" },
+});
+
+Task.belongsTo(User, {
+  foreignKey: "userId",
+});
+User.hasMany(Task, {
+  foreignKey: "userId",
+});
+
+module.exports = {
+  Task,
+  Label,
+  User,
+};
+

@@ -8,25 +8,31 @@ block content
       each err in errors
         li= err
 
+  - var v = (values && typeof values === 'object') ? values : {}
+  - var valTitre = v.titre || ''
+  - var valDesc = v.description || ''
+  - var valDatetime = v.datetime || ''
+  - var selId = (v.labelId != null ? String(v.labelId) : '')
+
   form(method="POST" action="/new")
     .field
       label(for="titre") Titre *
-      input#titre(type="text" name="titre" required value=(values?.titre || ''))
+      input#titre(type="text", name="titre", required, value=valTitre)
 
     .field
       label(for="description") Description
-      textarea#description(name="description")= values?.description || ''
+      textarea#description(name="description") #{valDesc}
 
     .field
       label(for="datetime") Deadline *
-      input#datetime(type="datetime-local" name="datetime" required value=(values?.datetime || ''))
+      input#datetime(type="datetime-local", name="datetime", required, value=valDatetime)
 
     .field
       label(for="labelId") Label
       select#labelId(name="labelId")
         option(value="") — Aucun —
         each l in labels
-          option(value=l.id selected=(String(values?.labelId||'')===String(l.id)))= `${l.name} (${l.color})`
+          option(value=l.id, selected=(selId === String(l.id)))= l.name + ' (' + l.color + ')'
 
     button(type="submit") Créer
     |  

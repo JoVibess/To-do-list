@@ -28,3 +28,11 @@ npm install
 ```bash
 # Dupliquer .env → .env.local :
 cp .env .env.local
+```
+
+## 3) Configuration (.env / .env.local)
+
+```bash
+# Exécuter les migrations :
+npx sequelize-cli db:migrate
+```

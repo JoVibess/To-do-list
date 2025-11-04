@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "SET NULL",
       });
 
+
     }
   }
 
@@ -59,3 +60,50 @@ module.exports = (sequelize, DataTypes) => {
 
   return Task;
 };
+
+Task.init(
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+
+    done: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+      defaultValue: 0,
+      validate: {
+        isIn: { args: [[0, 1]], msg: 'done doit être 0 ou 1' },
+      },
+    },
+
+    // DEADLINE OBLIGATOIRE
+    datetime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      validate: {
+        notNull: { msg: 'datetime requis' },
+        isDate: true,
+      },
+    },
+
+    titre: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      validate: { notEmpty: { msg: 'titre requis' } },
+    },
+
+    description: { type: DataTypes.TEXT, allowNull: true },
+
+    labelId: { type: DataTypes.INTEGER, allowNull: true, field: 'label_id' },
+
+    userId: { type: DataTypes.INTEGER, allowNull: false, field: 'user_id' },
+  },
+  {
+    sequelize,
+    modelName: 'Task',
+    tableName: 'task',
+    timestamps: false,
+    indexes: [{ fields: ['label_id'] }, { fields: ['user_id'] }],
+  }
+);
+
+module.exports = Task;
+
