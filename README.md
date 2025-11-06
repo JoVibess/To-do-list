@@ -30,9 +30,16 @@ npm install
 cp .env .env.local
 ```
 
-## 3) Configuration (.env / .env.local)
+## 3) Les migrations
 
 ```bash
 # Exécuter les migrations :
 npx sequelize-cli db:migrate
+```
+
+## 4) (Optionnel) Éxécuter le seeder
+
+```bash
+# Exécuter le seeder :
+npx sequelize-cli db:seed:all    
 ```
