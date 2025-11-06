@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Op } = require("sequelize");
-const { Task, Label } = require("../models/index");
+const { Task, Label } = require("../models");
 const { toSqlDatetime } = require("../utils/utils");
 const {
   buildWhereFromQuery,
@@ -12,23 +12,38 @@ const {
 // Page d’accueil /
 //---------------------------------------------------
 router.use((req, res, next) => {
-  if (!req.user) return res.redirect('/auth/login');
+  if (!req.user) return res.redirect("/auth/login");
   next();
 });
 
-router.get('/', async (req, res) => {
-  const { q = '', orderBy = 'id', order = 'desc', labelId = '', done = '' } = req.query;
+router.get("/", async (req, res) => {
+  const {
+    q = "",
+    orderBy = "id",
+    order = "desc",
+    labelId = "",
+    done = "",
+  } = req.query;
 
   const where = { ...buildWhereFromQuery(req.query), userId: req.user.id };
   const orderArr = buildOrderFromQuery(req.query);
-  const include = [{ model: Label, attributes: ['id', 'name', 'color'] }];
+  const include = [{ model: Label, attributes: ["id", "name", "color"] }];
 
   const tasksAll = await Task.findAll({ where, include, order: orderArr });
-  const tasksTodo = tasksAll.filter(t => Number(t.done) === 0);
-  const tasksDone = tasksAll.filter(t => Number(t.done) === 1);
-  const labels = await Label.findAll({ order: [['name', 'ASC']] });
+  const tasksTodo = tasksAll.filter((t) => Number(t.done) === 0);
+  const tasksDone = tasksAll.filter((t) => Number(t.done) === 1);
+  const labels = await Label.findAll({ order: [["name", "ASC"]] });
 
-  res.render('home', { q, orderBy, order, labelId, done, labels, tasksTodo, tasksDone });
+  res.render("home", {
+    q,
+    orderBy,
+    order,
+    labelId,
+    done,
+    labels,
+    tasksTodo,
+    tasksDone,
+  });
 });
 
 //---------------------------------------------------
