@@ -7,7 +7,7 @@ block content
       each e in errors
         li(style="color:red")= e
 
-  form(method="POST" action="/login")
+  form(method="POST" action="/auth/login")
     label(for="email") E-mail
     input#email(type="email" name="email" required)
     br
@@ -16,4 +16,4 @@ block content
     br
     button(type="submit") Se connecter
   br
-  a(href="/register") Créer un compte
+  a(href="/auth/register") Créer un compte

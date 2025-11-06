@@ -1,6 +1,18 @@
 extends layout
 
 block content
+  // Topbar
+  .topbar
+    if user
+      .left
+        span Bonjour #{user.email}
+      .right
+        form(method="post" action="/auth/logout")
+          button(type="submit") Se déconnecter
+    else
+      .right
+        a(href="/auth/login") Se connecter
+
   h1 to-do-list
 
   // Barre d’actions
