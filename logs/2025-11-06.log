@@ -594,3 +594,15 @@
 2025-11-06T10:44:22.392Z | ::ffff:127.0.0.1 | POST | /auth/login | 302
 2025-11-06T10:44:22.417Z | ::ffff:127.0.0.1 | GET | / | 304
 2025-11-06T10:44:22.433Z | ::ffff:127.0.0.1 | GET | /stylesheets/style.css | 304
+2025-11-06T10:50:42.649Z | ::ffff:127.0.0.1 | GET | / | 200
+2025-11-06T10:50:42.664Z | ::ffff:127.0.0.1 | GET | /stylesheets/style.css | 304
+2025-11-06T10:50:48.142Z | ::ffff:127.0.0.1 | GET | /?q=d%C3%A9jeu&done=&labelId=&orderBy=id&order=desc | 200
+2025-11-06T10:50:48.154Z | ::ffff:127.0.0.1 | GET | /stylesheets/style.css | 304
+2025-11-06T15:20:47.001Z | ::ffff:127.0.0.1 | GET | / | 302
+2025-11-06T15:20:47.145Z | ::ffff:127.0.0.1 | GET | /auth/login | 200
+2025-11-06T15:20:47.145Z | ::ffff:127.0.0.1 | GET | /auth/login | 200
+2025-11-06T15:20:47.155Z | ::ffff:127.0.0.1 | GET | /stylesheets/style.css | 304
+2025-11-06T15:20:53.025Z | ::ffff:127.0.0.1 | POST | /auth/login | 302
+2025-11-06T15:20:53.025Z | ::ffff:127.0.0.1 | POST | /auth/login | 302
+2025-11-06T15:20:53.068Z | ::ffff:127.0.0.1 | GET | / | 200
+2025-11-06T15:20:53.084Z | ::ffff:127.0.0.1 | GET | /stylesheets/style.css | 304
