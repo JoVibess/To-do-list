@@ -1,110 +1,98 @@
+#!/usr/bin/env node
 
 /**
- * Boot Express + Sequelize (avec migrations)
+ * Boot Express + Sequelize
  */
 
-const path = require("path");
-const dotenv = require("dotenv");
+const http = require('http');
+const debug = require('debug')('to-do-list:server');
+const path = require('path');
+const dotenv = require('dotenv');
 
-// Charge .env puis .env.local
-dotenv.config({ path: path.resolve(process.cwd(), ".env") });
-dotenv.config({ path: path.resolve(process.cwd(), ".env.local"), override: true });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({
+  path: path.resolve(process.cwd(), '.env.local'),
+  override: true,
+});
 
-const app = require("../app");
-const debug = require("debug")("to-do-list:server");
-const http = require("http");
+const app = require('../app');
+const sequelize = require('../core/sequelize');
 
-const { sequelize, Label } = require("../models"); 
+// Normalise le port et stocke dans Express
+const port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
 
-const sequelize = require("../core/sequelize");
-const { Label } = require("../models/Index"); // adapte la casse selon ton fichier
-
-const port = normalizePort(process.env.PORT || "3000");
-app.set("port", port);
-
+// Crée le serveur HTTP
 const server = http.createServer(app);
 
-
-/**
- * Démarrage asynchrone : connexion DB → puis écoute HTTP
- */
-
+// Démarrage asynchrone : DB d'abord, puis écoute HTTP
 (async () => {
   try {
-    console.log("Connexion DB…");
+    console.log('Connexion DB…');
     await sequelize.authenticate();
-    console.log("Base de données connectée");
-
-
-    console.log("Sync modèles…");
-    await sequelize.sync({ alter: true }); // en prod: préférer les migrations
-    console.log("Sync OK");
-
-    // ⚠️ NE PAS UTILISER sync() si tu travailles avec les migrations Sequelize CLI
-    // Les tables doivent déjà être créées via : npx sequelize-cli db:migrate
-
-
-    // Seed Label si vide
-    if ((await Label.count()) === 0) {
-      await Label.bulkCreate([
-        { name: "Perso",   color: "#4CAF50" },
-        { name: "Travail", color: "#2196F3" },
-        { name: "Urgent",  color: "#F44336" },
-      ]);
-      console.log("Labels par défaut insérés");
-    }
+    console.log('DB connectée');
 
     server.listen(port);
-    server.on("error", onError);
-    server.on("listening", onListening);
+    server.on('error', onError);
+    server.on('listening', onListening);
   } catch (err) {
-    console.error("Échec au démarrage du serveur :", err.message);
+    console.error('Échec init serveur:', err);
     process.exit(1);
   }
 })();
 
+/**
+ * Utils
+ */
 function normalizePort(val) {
   const n = parseInt(val, 10);
-
   if (Number.isNaN(n)) return val; // named pipe
-
-  if (Number.isNaN(n)) return val;
-
-  if (n >= 0) return n;
+  if (n >= 0) return n; // port number
   return false;
 }
 
 function onError(error) {
-  if (error.syscall !== "listen") throw error;
-  const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+  if (error.syscall !== 'listen') throw error;
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
   switch (error.code) {
-    case "EACCES":    console.error(bind + " requires elevated privileges"); process.exit(1); break;
-    case "EADDRINUSE":console.error(bind + " is already in use");            process.exit(1); break;
-    default: throw error;
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+    default:
+      throw error;
   }
 }
 
 function onListening() {
   const addr = server.address();
-  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
-  debug("Listening on " + bind);
-  console.log(`🚀 Serveur en écoute sur http://127.0.0.1:${bind.replace("port ", "")}`);
+  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+  console.log(`🚀 http://127.0.0.1:${bind.replace('port ', '')}`);
 }
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+/**
+ * Arrêt propre (Ctrl+C, etc.)
+ */
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled rejection:', err);
+});
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err);
+  shutdown();
+});
+
 async function shutdown() {
-
-  console.log("\nArrêt…");
-  try { await sequelize.close(); console.log("DB fermée"); } catch (e) { console.error("Erreur fermeture DB:", e); }
-
-  console.log("\nArrêt du serveur…");
+  console.log('\nArrêt…');
   try {
     await sequelize.close();
-    console.log("Connexion DB fermée");
+    console.log('DB fermée');
   } catch (e) {
-    console.error("Erreur fermeture DB:", e);
+    console.error('Erreur fermeture DB:', e);
   }
-
   server.close(() => process.exit(0));
 }
