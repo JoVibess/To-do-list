@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface) {
     const now = new Date();
 
     await queryInterface.sequelize.transaction(async (t) => {
