@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const { Op } = require("sequelize");
 const { Task, Label } = require("../models");
 const { toSqlDatetime } = require("../utils/utils");
 const {

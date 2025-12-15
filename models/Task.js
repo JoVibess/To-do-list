@@ -1,7 +1,5 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../core/sequelize');
-const Label = require('./Label');
-const User = require('./User');
 
 class Task extends Model {}
 
