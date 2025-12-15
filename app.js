@@ -23,7 +23,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes publiques (toujours AVANT authenticate)
-app.use('api/auth', authRoutes);
+app.use('/auth', authRoutes);
 
 // Routes protégées
 app.use('/', authenticate, pagesRoutes);
