@@ -27,6 +27,11 @@ User.init(
         },
       },
     },
+    role: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      defaultValue: 'client',
+    },
   },
   {
     sequelize,
